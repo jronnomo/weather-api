@@ -18,19 +18,19 @@ def data(station, date):
     stations_list = station_df[:100][["STAID", "STANAME                                 "]]
     station_id = stations_list.loc[stations_list["STAID"] == int(station)]["STAID"].squeeze()
     station_name = stations_list.loc[stations_list["STAID"] == int(station)]["STANAME                                 "].squeeze()
-    if station_id < 10:
-        station_str = '0' + str(station_id)
-    else:
-        station_str = str(station_id)
-    datafile = f"./data/data_small/TG_STAID0000{station_str}.txt"
+    station_id = str(station_id).zfill(6)
+    datafile = f"./data/data_small/TG_STAID{station_id}.txt"
     df = pd.read_csv(datafile, skiprows=20, parse_dates=["    DATE"])
-    temp = df.loc[df["    DATE"] == date]['   TG'].squeeze()
-    temp = temp / 10 * (9/5) + 32
-    return {
-        "Temp": f"{int(temp)}F",
-        "Station ID": f"{station_id}",
-        "Station Name": f"{station_name.strip(' ')}"
-    }
+    try:
+        temp = df.loc[df["    DATE"] == date]['   TG'].squeeze()
+        temp = temp / 10 * (9/5) + 32
+        return {
+            "Temp": f"{int(temp)}F",
+            "Station ID": f"{station_id}",
+            "Station Name": f"{station_name.strip(' ')}"
+        }
+    except TypeError:
+        return "Invalid Date"
 
 
 if __name__ == "__main__":
